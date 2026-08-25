@@ -569,6 +569,11 @@
         <label class="form-label">الاسم الكامل <span class="required">*</span></label>
         <input type="text" class="form-input" name="fullName" placeholder="أدخل اسمك الكامل ثلاثي" required>
       </div>
+      <!-- تم إضافة حقل البريد الإلكتروني هنا لمنع خطأ 422 من Formspree -->
+      <div class="form-group">
+        <label class="form-label">البريد الإلكتروني <span class="required">*</span></label>
+        <input type="email" class="form-input" name="email" placeholder="example@domain.com" required>
+      </div>
       <div class="form-group">
         <label class="form-label">رقم الهاتف / واتساب <span class="required">*</span></label>
         <input type="tel" class="form-input" name="phone" placeholder="مثال: 777123456" required>
@@ -821,6 +826,7 @@
 
     const data = {
       fullName: getInputValue('fullName'),
+      email: getInputValue('email'),
       phone: getInputValue('phone'),
       residenceArea: getInputValue('residenceArea'),
       workArea: getInputValue('workArea'),
@@ -863,6 +869,7 @@
 
               new Paragraph({ text: '1️⃣ البيانات الشخصية', heading: 'Heading2', spacing: { after: 200 } }),
               new Paragraph({ children: [new TextRun({ text: 'الاسم الكامل: ', bold: true }), new TextRun(data.fullName)] }),
+              new Paragraph({ children: [new TextRun({ text: 'البريد الإلكتروني: ', bold: true }), new TextRun(data.email)] }),
               new Paragraph({ children: [new TextRun({ text: 'رقم الهاتف / واتساب: ', bold: true }), new TextRun(data.phone)] }),
               new Paragraph({ children: [new TextRun({ text: 'منطقة السكن: ', bold: true }), new TextRun(data.residenceArea)] }),
               new Paragraph({ children: [new TextRun({ text: 'منطقة العمل: ', bold: true }), new TextRun(data.workArea)] }),
