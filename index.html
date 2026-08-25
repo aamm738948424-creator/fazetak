@@ -5,8 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>فزعتك — تسجيل مقدم خدمة</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- مكتبة توليد الـ PDF الحديثة -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script>
+    window.addEventListener('load', function () {
+      if (!window.docx) {
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js';
+        s.async = true;
+        document.head.appendChild(s);
+      }
+    });
+  </script>
   <style>
     :root {
       --blue-dark: #0B2B5B;
@@ -73,6 +83,14 @@
       animation: pulse 3s ease-in-out infinite;
     }
 
+    .logo-ring::before {
+      content: '';
+      position: absolute;
+      top: 8px; left: 8px; right: 8px; bottom: 8px;
+      border: 1.5px solid rgba(45, 108, 181, 0.15);
+      border-radius: 50%;
+    }
+
     @keyframes pulse {
       0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
       50% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; }
@@ -97,6 +115,7 @@
       color: #fff;
       margin-top: 18px;
       letter-spacing: -1px;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.4);
     }
 
     .tagline {
@@ -116,6 +135,15 @@
       margin: 24px 0;
       position: relative;
       overflow: hidden;
+    }
+
+    .about-card::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 140px; height: 140px;
+      background: radial-gradient(circle, rgba(242,101,34,0.1) 0%, transparent 70%);
+      border-radius: 50%;
     }
 
     .about-title {
@@ -168,6 +196,12 @@
       padding: 14px 10px;
       text-align: center;
       transition: all 0.3s ease;
+    }
+
+    .feature-item:hover {
+      background: rgba(242, 101, 34, 0.06);
+      border-color: rgba(242, 101, 34, 0.15);
+      transform: translateY(-2px);
     }
 
     .feature-icon { font-size: 26px; margin-bottom: 6px; display: block; }
@@ -245,6 +279,10 @@
       transition: all 0.3s ease;
     }
 
+    .form-input::placeholder, .form-textarea::placeholder {
+      color: rgba(168, 196, 224, 0.4);
+    }
+
     .form-input:focus, .form-select:focus, .form-textarea:focus {
       outline: none;
       border-color: var(--orange);
@@ -254,14 +292,14 @@
 
     .form-textarea { min-height: 90px; resize: vertical; }
 
-    /* Checkbox & Radio */
+    /* Checkbox Grid */
     .checkbox-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
       gap: 10px;
     }
 
-    .checkbox-item, .radio-item {
+    .checkbox-item {
       display: flex;
       align-items: center;
       gap: 10px;
@@ -273,7 +311,12 @@
       transition: all 0.25s ease;
     }
 
-    .checkbox-item input[type="checkbox"], .radio-item input[type="radio"] {
+    .checkbox-item:hover {
+      background: rgba(242, 101, 34, 0.08);
+      border-color: rgba(242, 101, 34, 0.25);
+    }
+
+    .checkbox-item input[type="checkbox"] {
       width: 20px;
       height: 20px;
       accent-color: var(--orange);
@@ -281,7 +324,7 @@
       flex-shrink: 0;
     }
 
-    .checkbox-item label, .radio-item label {
+    .checkbox-item label {
       cursor: pointer;
       font-size: 13.5px;
       color: var(--text-secondary);
@@ -289,9 +332,49 @@
       font-weight: 500;
     }
 
-    .radio-group { display: flex; flex-wrap: wrap; gap: 10px; }
+    /* Radio Group */
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
 
-    .time-row { display: flex; gap: 12px; align-items: center; }
+    .radio-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: rgba(255,255,255,0.03);
+      border: 1.5px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .radio-item:hover {
+      background: rgba(45, 108, 181, 0.1);
+      border-color: rgba(45, 108, 181, 0.3);
+    }
+
+    .radio-item input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--blue-light);
+    }
+
+    .radio-item label {
+      cursor: pointer;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .time-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
     .time-row .form-group { flex: 1; margin-bottom: 0; }
     .time-sep { color: var(--text-muted); font-weight: 700; font-size: 14px; }
 
@@ -310,12 +393,15 @@
       cursor: pointer;
       transition: all 0.3s ease;
       box-shadow: 0 10px 30px rgba(242, 101, 34, 0.3);
+      letter-spacing: 0.5px;
     }
 
     .submit-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 15px 40px rgba(242, 101, 34, 0.4);
     }
+
+    .submit-btn:active { transform: translateY(0); }
 
     /* Modal */
     .modal-overlay {
@@ -340,7 +426,13 @@
       text-align: center;
       max-width: 420px;
       width: 100%;
+      animation: modalIn 0.4s ease;
       box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.9) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
 
     .modal-icon { font-size: 56px; margin-bottom: 12px; }
@@ -357,21 +449,56 @@
       font-size: 15px;
       font-weight: 700;
       cursor: pointer;
+      transition: all 0.3s ease;
     }
+    .modal-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(45, 108, 181, 0.3); }
 
+    /* File upload */
     .file-upload {
       border: 2px dashed rgba(242, 101, 34, 0.2);
       border-radius: 14px;
       padding: 28px;
       text-align: center;
       cursor: pointer;
+      transition: all 0.3s ease;
       background: rgba(0,0,0,0.15);
     }
+
+    .file-upload:hover {
+      border-color: var(--orange);
+      background: rgba(242, 101, 34, 0.05);
+    }
+
     .file-upload input { display: none; }
     .file-upload-text { color: var(--text-muted); font-size: 14px; margin-top: 8px; }
+    .file-upload-icon { font-size: 36px; display: block; }
 
-    .footer { text-align: center; padding: 24px 0 40px; color: var(--text-muted); font-size: 12.5px; }
-    .footer-brand { color: var(--orange); font-weight: 700; font-size: 14px; }
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 24px 0 40px;
+      color: var(--text-muted);
+      font-size: 12.5px;
+    }
+
+    .footer-brand {
+      color: var(--orange);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .checkbox-grid { grid-template-columns: 1fr; }
+      .time-row { flex-direction: column; }
+      .features-grid { grid-template-columns: 1fr; }
+      .brand-name { font-size: 30px; }
+      .form-card { padding: 22px; }
+      .about-card { padding: 20px; }
+      .logo-img { width: 140px; height: 140px; }
+      .logo-ring { width: 170px; height: 170px; }
+      .logo-glow { width: 190px; height: 190px; }
+    }
   </style>
 </head>
 <body>
@@ -394,25 +521,55 @@
     <div class="about-title">عن فزعتك</div>
     <div class="about-text">
       <strong>فزعتك</strong> هي منصة خدمات متكاملة تعمل كـ <strong>مكتب وسيط</strong> يربط بين <strong>العملاء</strong> الذين يحتاجون خدمات منزلية وسيارات ونقل، وبين <strong>أفضل الفنيين والمقدمين</strong> الموثوقين في المدينة.
+      <br><br>
+      نحن لا نقدم الخدمة بأنفسنا — بل نحن <strong>الجسر</strong> الذي يضمن للعميل الحصول على خدمة سريعة ومحترفة، ويضمن للفني (<strong>مثلك</strong>) تدفقاً مستمراً من العملاء والطلبات.
     </div>
+
     <div class="about-highlight">
       <p>🎯 مهمتك كمقدم خدمة: تقديم عمل احترافي وممتاز → نحن نوفر لك العملاء → الجميع يربح</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-item">
+        <span class="feature-icon">🤝</span>
+        <span class="feature-label">نحن الوسيط</span>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">📲</span>
+        <span class="feature-label">نوصلك بالعميل</span>
+      </div>
+
+      <div class="feature-item">
+        <span class="feature-icon">⚡</span>
+        <span class="feature-label">طلبات طارئة</span>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">🛡️</span>
+        <span class="feature-label">موثوقية مضمونة</span>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">📍</span>
+        <span class="feature-label">خدمة من قلب المكان</span>
+      </div>
     </div>
   </div>
 
   <!-- ===== FORM ===== -->
   <div class="form-card">
     <div class="form-intro">
-      📝 املأ البيانات التالية بعناية. سيتم حفظ طلبك وتوليد ملف PDF رسمي باسمك فور الإرسال.
+      📝 املأ البيانات التالية بعناية. كلما كانت المعلومات دقيقة، زادت فرصتك في الحصول على طلبات أكثر.
     </div>
 
     <form id="providerForm" action="https://formspree.io/f/mdenvyqj" method="POST">
 
+      <!-- Section 1 -->
       <div class="section-title"><span class="section-num">1</span> البيانات الشخصية</div>
+
       <div class="form-group">
         <label class="form-label">الاسم الكامل <span class="required">*</span></label>
         <input type="text" class="form-input" name="fullName" placeholder="أدخل اسمك الكامل ثلاثي" required>
       </div>
+      <!-- تم إضافة حقل البريد الإلكتروني هنا لمنع خطأ 422 من Formspree -->
       <div class="form-group">
         <label class="form-label">البريد الإلكتروني <span class="required">*</span></label>
         <input type="email" class="form-input" name="email" placeholder="example@domain.com" required>
@@ -430,44 +587,189 @@
         <input type="text" class="form-input" name="workArea" placeholder="مناطق عملك المعتادة" required>
       </div>
 
+      <!-- Section 2 -->
       <div class="section-title"><span class="section-num">2</span> التخصص والخدمات</div>
+
       <div class="form-group">
-        <label class="form-label">ما تخصصك الرئيسي؟</label>
+        <label class="form-label">ما تخصصك الرئيسي؟ (يمكن اختيار أكثر من واحد)</label>
         <div class="checkbox-grid">
           <div class="checkbox-item"><input type="checkbox" id="spec1" name="specialty" value="كهرباء"><label for="spec1">⚡ كهرباء</label></div>
           <div class="checkbox-item"><input type="checkbox" id="spec2" name="specialty" value="سباكة"><label for="spec2">🚰 سباكة</label></div>
           <div class="checkbox-item"><input type="checkbox" id="spec3" name="specialty" value="تكييف وتبريد"><label for="spec3">❄️ تكييف وتبريد</label></div>
           <div class="checkbox-item"><input type="checkbox" id="spec4" name="specialty" value="ميكانيكا سيارات"><label for="spec4">🔧 ميكانيكا سيارات</label></div>
-          <div class="checkbox-item"><input type="checkbox" id="spec5" name="specialty" value="نقل"><label for="spec5">🚚 نقل</label></div>
-          <div class="checkbox-item"><input type="checkbox" id="spec6" name="specialty" value="سطحة"><label for="spec6">🚛 سطحة</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="spec5" name="specialty" value="كهرباء سيارات"><label for="spec5">⚡ كهرباء سيارات</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="spec6" name="specialty" value="نقل"><label for="spec6">🚚 نقل</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="spec7" name="specialty" value="سطحة"><label for="spec7">🚛 سطحة</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="spec8" name="specialty" value="تحميل وتنزيل"><label for="spec8">👷 تحميل وتنزيل</label></div>
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">تفاصيل إضافية عن الخدمات</label>
-        <textarea class="form-textarea" name="servicesDetails" placeholder="اذكر الخدمات بالتفصيل..."></textarea>
+        <label class="form-label">تخصص آخر</label>
+        <input type="text" class="form-input" name="otherSpecialty" placeholder="أدخل التخصص إن وجد">
+      </div>
+      <div class="form-group">
+        <label class="form-label">ما الخدمات التي تستطيع تقديمها بالتحديد؟</label>
+        <textarea class="form-textarea" name="servicesDetails" placeholder="اذكر الخدمات بالتفصيل حتى يتمكن العميل من معرفة ما تقدمه..."></textarea>
       </div>
 
+      <!-- Section 3 -->
       <div class="section-title"><span class="section-num">3</span> الخبرة والعمل</div>
+
       <div class="form-group">
         <label class="form-label">كم سنة خبرة لديك؟</label>
         <div class="radio-group">
           <div class="radio-item"><input type="radio" id="exp1" name="experience" value="أقل من سنة"><label for="exp1">أقل من سنة</label></div>
           <div class="radio-item"><input type="radio" id="exp2" name="experience" value="1-3 سنوات"><label for="exp2">1 – 3 سنوات</label></div>
-          <div class="radio-item"><input type="radio" id="exp3" name="experience" value="أكثر من 5 سنوات"><label for="exp3">أكثر من 5 سنوات</label></div>
+          <div class="radio-item"><input type="radio" id="exp3" name="experience" value="3-5 سنوات"><label for="exp3">3 – 5 سنوات</label></div>
+          <div class="radio-item"><input type="radio" id="exp4" name="experience" value="أكثر من 5 سنوات"><label for="exp4">أكثر من 5 سنوات</label></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">هل تعمل حاليًا؟</label>
+        <div class="radio-group">
+          <div class="radio-item"><input type="radio" id="work1" name="currentlyWorking" value="نعم"><label for="work1">نعم</label></div>
+          <div class="radio-item"><input type="radio" id="work2" name="currentlyWorking" value="لا"><label for="work2">لا</label></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">هل تعمل بشكل مستقل أم مع مؤسسة/ورشة؟</label>
+        <div class="radio-group">
+          <div class="radio-item"><input type="radio" id="type1" name="workType" value="مستقل"><label for="type1">مستقل</label></div>
+          <div class="radio-item"><input type="radio" id="type2" name="workType" value="مؤسسة/ورشة"><label for="type2">مؤسسة / ورشة</label></div>
+          <div class="radio-item"><input type="radio" id="type3" name="workType" value="الاثنين"><label for="type3">الاثنين</label></div>
         </div>
       </div>
 
-      <div class="section-title"><span class="section-num">4</span> مناطق الخدمة وأوقات العمل</div>
+      <!-- Section 4 -->
+      <div class="section-title"><span class="section-num">4</span> مناطق الخدمة</div>
+
+      <div class="form-group">
+        <label class="form-label">ما المناطق التي تستطيع الوصول إليها؟</label>
+        <div class="checkbox-grid">
+          <div class="checkbox-item"><input type="checkbox" id="area1" name="serviceAreas" value="كريتر"><label for="area1">كريتر</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="area2" name="serviceAreas" value="المعلا"><label for="area2">المعلا</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="area3" name="serviceAreas" value="التواهي"><label for="area3">التواهي</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="area4" name="serviceAreas" value="خور مكسر"><label for="area4">خور مكسر</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="area5" name="serviceAreas" value="المنصورة"><label for="area5">المنصورة</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="area6" name="serviceAreas" value="الشيخ عثمان"><label for="area6">الشيخ عثمان</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="area7" name="serviceAreas" value="دار سعد"><label for="area7">دار سعد</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="area8" name="serviceAreas" value="البريقة"><label for="area8">البريقة</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="area9" name="serviceAreas" value="الشعب"><label for="area9">الشعب</label></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">منطقة أخرى</label>
+        <input type="text" class="form-input" name="otherArea" placeholder="أدخل المنطقة إن وجدت">
+      </div>
+      <div class="form-group">
+        <label class="form-label">هل تستطيع استقبال الطلبات الطارئة؟</label>
+        <div class="radio-group">
+          <div class="radio-item"><input type="radio" id="urgent1" name="urgentOrders" value="نعم"><label for="urgent1">نعم</label></div>
+          <div class="radio-item"><input type="radio" id="urgent2" name="urgentOrders" value="لا"><label for="urgent2">لا</label></div>
+        </div>
+      </div>
       <div class="form-group">
         <label class="form-label">أوقات العمل المتاحة</label>
         <div class="time-row">
-          <div class="form-group"><input type="time" class="form-input" name="workFrom" required></div>
+          <div class="form-group">
+            <input type="time" class="form-input" name="workFrom" required>
+          </div>
           <span class="time-sep">إلى</span>
-          <div class="form-group"><input type="time" class="form-input" name="workTo" required></div>
+          <div class="form-group">
+            <input type="time" class="form-input" name="workTo" required>
+          </div>
         </div>
       </div>
 
-      <button type="submit" class="submit-btn">📥 إرسال الطلب وتحميل ملف الـ PDF</button>
+      <!-- Section 5 -->
+      <div class="section-title"><span class="section-num">5</span> الأسعار والعمولة</div>
+
+      <div class="form-group">
+        <label class="form-label">هل لديك أسعار محددة لخدماتك؟</label>
+        <div class="radio-group">
+          <div class="radio-item"><input type="radio" id="price1" name="hasPrices" value="نعم"><label for="price1">نعم</label></div>
+          <div class="radio-item"><input type="radio" id="price2" name="hasPrices" value="لا"><label for="price2">لا</label></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">رسوم الكشف / الزيارة (ريال)</label>
+        <input type="number" class="form-input" name="inspectionFee" placeholder="0" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">أقل أجرة عمل تقريبية (ريال)</label>
+        <input type="number" class="form-input" name="minFee" placeholder="0" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">هل تقبل العمل بنظام العمولة مع فزعتك؟</label>
+        <div class="radio-group">
+          <div class="radio-item"><input type="radio" id="comm1" name="commission" value="نعم"><label for="comm1">نعم</label></div>
+          <div class="radio-item"><input type="radio" id="comm2" name="commission" value="قابل للتفاوض"><label for="comm2">قابل للتفاوض</label></div>
+          <div class="radio-item"><input type="radio" id="comm3" name="commission" value="لا"><label for="comm3">لا</label></div>
+        </div>
+      </div>
+
+      <!-- Section 6 -->
+      <div class="section-title"><span class="section-num">6</span> الأعمال السابقة</div>
+
+      <div class="form-group">
+        <label class="form-label">هل لديك صور أو فيديوهات لأعمال سابقة؟</label>
+        <div class="radio-group">
+          <div class="radio-item"><input type="radio" id="prev1" name="hasPreviousWork" value="نعم"><label for="prev1">نعم</label></div>
+          <div class="radio-item"><input type="radio" id="prev2" name="hasPreviousWork" value="لا"><label for="prev2">لا</label></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">أرفق صورًا من أعمالك (اختياري)</label>
+        <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+          <input type="file" id="fileInput" name="attachments" multiple accept="image/*">
+          <span class="file-upload-icon">📷</span>
+          <div class="file-upload-text">اضغط هنا لرفع الصور من أعمالك</div>
+        </div>
+        <div id="fileList" style="margin-top:10px; color:var(--text-muted); font-size:13px;"></div>
+      </div>
+
+      <!-- Section 7 -->
+      <div class="section-title"><span class="section-num">7</span> معلومات إضافية</div>
+
+      <div class="form-group">
+        <label class="form-label">هل لديك خبرة في الحالات الطارئة؟</label>
+        <div class="radio-group">
+          <div class="radio-item"><input type="radio" id="emerg1" name="emergencyExp" value="نعم"><label for="emerg1">نعم</label></div>
+          <div class="radio-item"><input type="radio" id="emerg2" name="emergencyExp" value="لا"><label for="emerg2">لا</label></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">هل تستطيع الوصول للعميل خلال وقت قصير؟</label>
+        <div class="radio-group">
+          <div class="radio-item"><input type="radio" id="fast1" name="fastArrival" value="نعم"><label for="fast1">نعم</label></div>
+          <div class="radio-item"><input type="radio" id="fast2" name="fastArrival" value="لا"><label for="fast2">لا</label></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ما الذي يميزك عن غيرك؟</label>
+        <textarea class="form-textarea" name="uniquePoints" placeholder="اكتب ما يميز خدماتك عن الآخرين — الجودة، السرعة، السعر، الضمان..."></textarea>
+      </div>
+
+      <!-- Section 8 -->
+      <div class="section-title"><span class="section-num">8</span> التوصية والتحقق</div>
+      <p style="color:var(--text-muted); font-size:13px; margin-bottom:15px; line-height:1.7;">
+        هذه المعلومة <strong style="color:var(--orange);">اختيارية</strong>، والغرض منها التحقق من خبرتك ومصداقيتك المهنية أمام فريق فزعتك.
+      </p>
+
+      <div class="form-group">
+        <label class="form-label">اسم الشخص الذي يعرفك مهنيًا</label>
+        <input type="text" class="form-input" name="refName" placeholder="الاسم الكامل">
+      </div>
+      <div class="form-group">
+        <label class="form-label">رقم هاتفه</label>
+        <input type="tel" class="form-input" name="refPhone" placeholder="رقم الهاتف">
+      </div>
+      <div class="form-group">
+        <label class="form-label">طبيعة المعرفة</label>
+        <input type="text" class="form-input" name="refRelation" placeholder="مثال: زميل عمل، صاحب ورشة، عميل سابق...">
+      </div>
+
+      <button type="submit" class="submit-btn">📋 إرسال طلب الانضمام إلى فزعتك</button>
     </form>
   </div>
 
@@ -483,43 +785,24 @@
     <div class="modal-icon">🎉</div>
     <div class="modal-title">تم إرسال طلبك بنجاح!</div>
     <div class="modal-text">
-      تم إرسال بياناتك لبريد المنصة، وحفظ نسخة PDF منسقة باسمك على جهازك.<br>
-      سنتواصل معك قريباً.
+      تم استلام بياناتك وسيقوم فريق فزعتك بمراجعتها خلال 24 ساعة.<br>
+      سنتواصل معك فور الموافقة على طلبك.
     </div>
     <button class="modal-btn" onclick="closeModal()">حسنًا، شكرًا</button>
   </div>
 </div>
 
-<!-- قالب مخفي يتم تحويله تلقائياً إلى PDF بتصميم احترافي -->
-<div id="pdfTemplate" style="display:none; direction: rtl; font-family: 'Cairo', sans-serif; padding: 40px; background: #ffffff; color: #111; width: 750px;">
-  <div style="text-align: center; border-bottom: 3px solid #F26522; padding-bottom: 20px; margin-bottom: 30px;">
-    <h1 style="color: #0B2B5B; margin: 0; font-size: 28px;">منصة فزعتك</h1>
-    <p style="color: #F26522; font-weight: bold; margin: 5px 0 0 0; font-size: 14px;">استمارة تسجيل مقدم خدمة معتمد</p>
-  </div>
-
-  <h3 style="background: #0B2B5B; color: #ffffff; padding: 8px 12px; border-radius: 6px; font-size: 16px; margin-bottom: 15px;">1. البيانات الشخصية</h3>
-  <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;">
-    <tr><td style="padding: 8px; border-bottom: 1px solid #ddd; width: 35%; font-weight: bold; color: #555;">الاسم الكامل:</td><td id="pdf_fullName" style="padding: 8px; border-bottom: 1px solid #ddd; color: #000;"></td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold; color: #555;">البريد الإلكتروني:</td><td id="pdf_email" style="padding: 8px; border-bottom: 1px solid #ddd; color: #000;"></td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold; color: #555;">رقم الهاتف / واتساب:</td><td id="pdf_phone" style="padding: 8px; border-bottom: 1px solid #ddd; color: #000;"></td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold; color: #555;">منطقة السكن:</td><td id="pdf_residenceArea" style="padding: 8px; border-bottom: 1px solid #ddd; color: #000;"></td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold; color: #555;">منطقة العمل:</td><td id="pdf_workArea" style="padding: 8px; border-bottom: 1px solid #ddd; color: #000;"></td></tr>
-  </table>
-
-  <h3 style="background: #0B2B5B; color: #ffffff; padding: 8px 12px; border-radius: 6px; font-size: 16px; margin-bottom: 15px;">2. التخصص والخبرة</h3>
-  <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;">
-    <tr><td style="padding: 8px; border-bottom: 1px solid #ddd; width: 35%; font-weight: bold; color: #555;">التخصصات:</td><td id="pdf_specialties" style="padding: 8px; border-bottom: 1px solid #ddd; color: #000;"></td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold; color: #555;">سنوات الخبرة:</td><td id="pdf_experience" style="padding: 8px; border-bottom: 1px solid #ddd; color: #000;"></td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold; color: #555;">تفاصيل الخدمات:</td><td id="pdf_servicesDetails" style="padding: 8px; border-bottom: 1px solid #ddd; color: #000;"></td></tr>
-    <tr><td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold; color: #555;">أوقات العمل:</td><td id="pdf_workHours" style="padding: 8px; border-bottom: 1px solid #ddd; color: #000;"></td></tr>
-  </table>
-
-  <div style="margin-top: 40px; text-align: center; font-size: 12px; color: #777; border-top: 1px solid #eee; padding-top: 15px;">
-    تم استخراج هذا المستند إلكترونياً من منصة فزعتك — كل الخدمات في مكان واحد © 2026
-  </div>
-</div>
-
 <script>
+  // File upload display
+  document.getElementById('fileInput').addEventListener('change', function(e) {
+    const files = e.target.files;
+    const list = document.getElementById('fileList');
+    if (files.length > 0) {
+      list.innerHTML = '✅ تم اختيار ' + files.length + ' ملف(ات):<br>' + 
+        Array.from(files).map(f => '• ' + f.name).join('<br>');
+    }
+  });
+
   function getCheckedValues(name) {
     return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked')).map(cb => cb.value);
   }
@@ -537,7 +820,7 @@
 
     const btn = this.querySelector('.submit-btn');
     const originalText = btn.innerText;
-    btn.innerText = '⏳ جاري توليد ملف الـ PDF والإرسال...';
+    btn.innerText = '⏳ جاري الإرسال...';
     btn.disabled = true;
     btn.style.opacity = '0.7';
 
@@ -547,47 +830,115 @@
       phone: getInputValue('phone'),
       residenceArea: getInputValue('residenceArea'),
       workArea: getInputValue('workArea'),
-      specialties: getCheckedValues('specialty').join('، ') || '—',
-      experience: getRadioValue('experience') || '—',
-      servicesDetails: getInputValue('servicesDetails') || '—',
-      workHours: (getInputValue('workFrom') || '—') + ' إلى ' + (getInputValue('workTo') || '—')
+      specialties: getCheckedValues('specialty'),
+      otherSpecialty: getInputValue('otherSpecialty'),
+      servicesDetails: getInputValue('servicesDetails'),
+      experience: getRadioValue('experience'),
+      currentlyWorking: getRadioValue('currentlyWorking'),
+      workType: getRadioValue('workType'),
+      serviceAreas: getCheckedValues('serviceAreas'),
+      otherArea: getInputValue('otherArea'),
+      urgentOrders: getRadioValue('urgentOrders'),
+      workFrom: getInputValue('workFrom'),
+      workTo: getInputValue('workTo'),
+      hasPrices: getRadioValue('hasPrices'),
+      inspectionFee: getInputValue('inspectionFee'),
+      minFee: getInputValue('minFee'),
+      commission: getRadioValue('commission'),
+      hasPreviousWork: getRadioValue('hasPreviousWork'),
+      emergencyExp: getRadioValue('emergencyExp'),
+      fastArrival: getRadioValue('fastArrival'),
+      uniquePoints: getInputValue('uniquePoints'),
+      refName: getInputValue('refName'),
+      refPhone: getInputValue('refPhone'),
+      refRelation: getInputValue('refRelation')
     };
 
-    // تعبئة بيانات قالب الـ PDF المخفي
-    document.getElementById('pdf_fullName').innerText = data.fullName;
-    document.getElementById('pdf_email').innerText = data.email;
-    document.getElementById('pdf_phone').innerText = data.phone;
-    document.getElementById('pdf_residenceArea').innerText = data.residenceArea;
-    document.getElementById('pdf_workArea').innerText = data.workArea;
-    document.getElementById('pdf_specialties').innerText = data.specialties;
-    document.getElementById('pdf_experience').innerText = data.experience;
-    document.getElementById('pdf_servicesDetails').innerText = data.servicesDetails;
-    document.getElementById('pdf_workHours').innerText = data.workHours;
-
-    // توليد وتحميل ملف الـ PDF باستخدام مكتبة html2pdf
+    // Try generating Word document safely without blocking form submission
     try {
-      const element = document.getElementById('pdfTemplate');
-      element.style.display = 'block'; // إظهار مؤقت للتلتقط الصورة
-      
-      const opt = {
-        margin:       10,
-        filename:     'استمارة_فزعتك_' + data.fullName.replace(/\s+/g, '_') + '.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
+      if (window.docx && window.docx.Document && window.docx.Packer) {
+        const { Document, Packer, Paragraph, TextRun, AlignmentType } = window.docx;
 
-      await html2pdf().from(element).set(opt).save();
-      element.style.display = 'none'; // إخفاء القالب مرة أخرى
-    } catch (pdfErr) {
-      console.warn('خطأ في توليد الـ PDF:', pdfErr);
-      document.getElementById('pdfTemplate').style.display = 'none';
+        const doc = new Document({
+          sections: [{
+            properties: { page: { margin: { top: 1000, right: 1000, bottom: 1000, left: 1000 } } },
+            children: [
+              new Paragraph({ text: '🏢 استمارة تسجيل مقدم خدمة — فزعتك', heading: 'Heading1', alignment: AlignmentType.CENTER, spacing: { after: 200 } }),
+              new Paragraph({ text: '«كل الخدمات في مكان واحد»', alignment: AlignmentType.CENTER, spacing: { after: 400 } }),
+              new Paragraph({ text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', alignment: AlignmentType.CENTER, spacing: { after: 300 } }),
+
+              new Paragraph({ text: '1️⃣ البيانات الشخصية', heading: 'Heading2', spacing: { after: 200 } }),
+              new Paragraph({ children: [new TextRun({ text: 'الاسم الكامل: ', bold: true }), new TextRun(data.fullName)] }),
+              new Paragraph({ children: [new TextRun({ text: 'البريد الإلكتروني: ', bold: true }), new TextRun(data.email)] }),
+              new Paragraph({ children: [new TextRun({ text: 'رقم الهاتف / واتساب: ', bold: true }), new TextRun(data.phone)] }),
+              new Paragraph({ children: [new TextRun({ text: 'منطقة السكن: ', bold: true }), new TextRun(data.residenceArea)] }),
+              new Paragraph({ children: [new TextRun({ text: 'منطقة العمل: ', bold: true }), new TextRun(data.workArea)] }),
+              new Paragraph({ text: '', spacing: { after: 200 } }),
+
+              new Paragraph({ text: '2️⃣ التخصص والخدمات', heading: 'Heading2', spacing: { after: 200 } }),
+              new Paragraph({ children: [new TextRun({ text: 'التخصص الرئيسي: ', bold: true }), new TextRun(data.specialties.join('، ') || '—')] }),
+              new Paragraph({ children: [new TextRun({ text: 'تخصص آخر: ', bold: true }), new TextRun(data.otherSpecialty || '—')] }),
+              new Paragraph({ children: [new TextRun({ text: 'الخدمات المقدمة: ', bold: true }), new TextRun(data.servicesDetails || '—')] }),
+              new Paragraph({ text: '', spacing: { after: 200 } }),
+
+              new Paragraph({ text: '3️⃣ الخبرة والعمل', heading: 'Heading2', spacing: { after: 200 } }),
+              new Paragraph({ children: [new TextRun({ text: 'سنوات الخبرة: ', bold: true }), new TextRun(data.experience || '—')] }),
+              new Paragraph({ children: [new TextRun({ text: 'هل يعمل حاليًا: ', bold: true }), new TextRun(data.currentlyWorking || '—')] }),
+              new Paragraph({ children: [new TextRun({ text: 'نوع العمل: ', bold: true }), new TextRun(data.workType || '—')] }),
+              new Paragraph({ text: '', spacing: { after: 200 } }),
+
+              new Paragraph({ text: '4️⃣ مناطق الخدمة', heading: 'Heading2', spacing: { after: 200 } }),
+              new Paragraph({ children: [new TextRun({ text: 'المناطق المغطاة: ', bold: true }), new TextRun(data.serviceAreas.join('، ') || '—')] }),
+              new Paragraph({ children: [new TextRun({ text: 'منطقة أخرى: ', bold: true }), new TextRun(data.otherArea || '—')] }),
+              new Paragraph({ children: [new TextRun({ text: 'استقبال الطلبات الطارئة: ', bold: true }), new TextRun(data.urgentOrders || '—')] }),
+              new Paragraph({ children: [new TextRun({ text: 'أوقات العمل: ', bold: true }), new TextRun((data.workFrom || '—') + ' إلى ' + (data.workTo || '—'))] }),
+              new Paragraph({ text: '', spacing: { after: 200 } }),
+
+              new Paragraph({ text: '5️⃣ الأسعار والعمولة', heading: 'Heading2', spacing: { after: 200 } }),
+              new Paragraph({ children: [new TextRun({ text: 'هل لديه أسعار محددة: ', bold: true }), new TextRun(data.hasPrices || '—')] }),
+              new Paragraph({ children: [new TextRun({ text: 'رسوم الكشف / الزيارة: ', bold: true }), new TextRun((data.inspectionFee || '—') + ' ريال')] }),
+              new Paragraph({ children: [new TextRun({ text: 'أقل أجرة عمل: ', bold: true }), new TextRun((data.minFee || '—') + ' ريال')] }),
+              new Paragraph({ children: [new TextRun({ text: 'نظام العمولة: ', bold: true }), new TextRun(data.commission || '—')] }),
+              new Paragraph({ text: '', spacing: { after: 200 } }),
+
+              new Paragraph({ text: '6️⃣ الأعمال السابقة', heading: 'Heading2', spacing: { after: 200 } }),
+              new Paragraph({ children: [new TextRun({ text: 'هل لديه أعمال سابقة: ', bold: true }), new TextRun(data.hasPreviousWork || '—')] }),
+              new Paragraph({ text: '', spacing: { after: 200 } }),
+
+              new Paragraph({ text: '7️⃣ معلومات إضافية', heading: 'Heading2', spacing: { after: 200 } }),
+              new Paragraph({ children: [new TextRun({ text: 'خبرة في الحالات الطارئة: ', bold: true }), new TextRun(data.emergencyExp || '—')] }),
+              new Paragraph({ children: [new TextRun({ text: 'الوصول السريع: ', bold: true }), new TextRun(data.fastArrival || '—')] }),
+              new Paragraph({ children: [new TextRun({ text: 'ما يميزه: ', bold: true }), new TextRun(data.uniquePoints || '—')] }),
+              new Paragraph({ text: '', spacing: { after: 200 } }),
+
+              new Paragraph({ text: '8️⃣ التوصية والتحقق', heading: 'Heading2', spacing: { after: 200 } }),
+              new Paragraph({ children: [new TextRun({ text: 'اسم المرجع: ', bold: true }), new TextRun(data.refName || '—')] }),
+              new Paragraph({ children: [new TextRun({ text: 'رقم هاتف المرجع: ', bold: true }), new TextRun(data.refPhone || '—')] }),
+              new Paragraph({ children: [new TextRun({ text: 'طبيعة المعرفة: ', bold: true }), new TextRun(data.refRelation || '—')] }),
+
+              new Paragraph({ text: '', spacing: { after: 400 } }),
+              new Paragraph({ text: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', alignment: AlignmentType.CENTER }),
+              new Paragraph({ text: 'شكراً لانضمامك إلى فزعتك!', alignment: AlignmentType.CENTER, spacing: { before: 200 } }),
+              new Paragraph({ text: '© 2026 فزعتك — كل الخدمات في مكان واحد', alignment: AlignmentType.CENTER, spacing: { before: 100 } })
+            ]
+          }]
+        });
+
+        const blob = await Packer.toBlob(doc);
+        if (typeof saveAs === 'function') {
+          saveAs(blob, 'استمارة_فزعتك_' + data.fullName + '.docx');
+        }
+      }
+    } catch (docxErr) {
+      console.warn('تجاوز خطأ مكتبة الـ Word:', docxErr);
     }
 
-    // إرسال البيانات إلى الفورم سبري (Formspree)
+    // Submit to Formspree
     try {
       const formData = new FormData(this);
       formData.append('_subject', 'طلب تسجيل جديد من فزعتك: ' + data.fullName);
+      formData.append('specialties_summary', data.specialties.join('، ') || '—');
+      formData.append('serviceAreas_summary', data.serviceAreas.join('، ') || '—');
 
       const response = await fetch(this.action, { 
         method: 'POST', 
@@ -601,10 +952,11 @@
 
       document.getElementById('successModal').classList.add('active');
       this.reset();
+      document.getElementById('fileList').innerHTML = '';
 
     } catch (err) {
       console.error('Error during submission:', err);
-      alert('❌ حدث خطأ أثناء إرسال البيانات للإيميل، ولكن تم تحميل ملف الـ PDF على جهازك بنجاح.');
+      alert('❌ لم يتم إرسال الطلب إلى البريد الإلكتروني.\n\n' + (err.message || 'حدث خطأ غير معروف'));
     } finally {
       btn.innerText = originalText;
       btn.disabled = false;
